@@ -16,7 +16,7 @@ export default function Home() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
-    const res = await fetch('http://localhost:8000/onboard', {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/onboard`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form),

@@ -7,7 +7,7 @@ export default function Calendar() {
 
   const fetchCalendar = async () => {
     setLoading(true);
-    const res = await fetch(`http://localhost:8000/calendar/${email}`);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/calendar/${email}`);
     const data = await res.json();
     setCalendar(data);
     setLoading(false);

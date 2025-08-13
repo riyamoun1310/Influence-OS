@@ -1,6 +1,6 @@
 export default function LinkedInAuth() {
   const handleLogin = () => {
-    window.location.href = 'http://localhost:8000/linkedin/login';
+  window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/linkedin/login`;
   };
 
   return (

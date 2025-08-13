@@ -8,7 +8,7 @@ export default function News() {
   const fetchNews = async () => {
     setLoading(true);
     setArticles([]);
-    const res = await fetch(`http://localhost:8000/industry-news?query=${encodeURIComponent(query)}`);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/industry-news?query=${encodeURIComponent(query)}`);
     const data = await res.json();
     setArticles(data.articles || []);
     setLoading(false);

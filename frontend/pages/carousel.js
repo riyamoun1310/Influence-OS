@@ -8,7 +8,7 @@ export default function Carousel() {
   const generateCarousel = async () => {
     setLoading(true);
     setCarousel([]);
-    const res = await fetch(`http://localhost:8000/generate-carousel?email=${email}`);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/generate-carousel?email=${email}`);
     const data = await res.json();
     setCarousel(data.carousel || []);
     setLoading(false);

@@ -8,7 +8,7 @@ export default function Article() {
   const generateArticle = async () => {
     setLoading(true);
     setArticle('');
-    const res = await fetch(`http://localhost:8000/generate-article?email=${email}`);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/generate-article?email=${email}`);
     const data = await res.json();
     setArticle(data.article);
     setLoading(false);

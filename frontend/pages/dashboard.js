@@ -9,7 +9,7 @@ export default function Dashboard() {
 
   const fetchProfile = async () => {
     setLoading(true);
-    const res = await fetch(`http://localhost:8000/profile/${email}`);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profile/${email}`);
     const data = await res.json();
     setProfile(data.profile);
     setLoading(false);
@@ -17,7 +17,7 @@ export default function Dashboard() {
 
   const generateContent = async () => {
     setContentLoading(true);
-    const res = await fetch(`http://localhost:8000/generate-content?email=${email}`);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/generate-content?email=${email}`);
     const data = await res.json();
     setContent(data.content);
     setContentLoading(false);
