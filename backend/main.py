@@ -15,66 +15,39 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # In production, specify your frontend URL
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-class UserProfile(BaseModel):
-    name: str
-    email: str
-    linkedin_url: str
 
-class ScheduleRequest(BaseModel):
-    email: str
-    content: str
-    scheduled_time: Optional[str] = None  # ISO format
+    from pydantic import BaseModel
+    from fastapi import FastAPI, HTTPException, Query
+    from fastapi.middleware.cors import CORSMiddleware
+    from fastapi.responses import RedirectResponse
+    from typing import Optional
+    import os
+    import openai
+    import requests
+    from sqlalchemy import create_engine, Column, Integer, String, JSON, DateTime, Text, ForeignKey
+    from sqlalchemy.ext.declarative import declarative_base
+    from sqlalchemy.orm import sessionmaker, relationship
+    from datetime import datetime, timedelta
 
+    app = FastAPI(title="Influence-OS1 Backend")
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # In production, specify your frontend URL
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
-# FastAPI and imports (move to top)
+    class UserProfile(BaseModel):
+        name: str
+        email: str
+        linkedin_url: str
+        tone: Optional[str] = None
 
-# FastAPI and imports
-from fastapi import FastAPI, HTTPException, Query
-from fastapi.middleware.cors import CORSMiddleware
-# Database setup
-class UserProfile(BaseModel):
-    name: str
-    email: str
-    linkedin_url: str
-    tone: str
-from fastapi.responses import RedirectResponse
-from pydantic import BaseModel
-from typing import Optional
-import os
-import openai
-import requests
-# SQLAlchemy for PostgreSQL
-from sqlalchemy import create_engine, Column, Integer, String, JSON, DateTime, Text, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
-from datetime import datetime
-
-# SQLAlchemy for PostgreSQL
-from sqlalchemy import create_engine, Column, Integer, String, JSON, DateTime, Text, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
-from datetime import datetime
-
-# Database setup
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@localhost:5432/influenceos")
-
-from pydantic import BaseModel
-from fastapi import FastAPI, HTTPException, Query
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
-from typing import Optional
-import os
-import openai
-import requests
-from sqlalchemy import create_engine, Column, Integer, String, JSON, DateTime, Text, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
-from datetime import datetime, timedelta
-
-app = FastAPI(title="Influence-OS1 Backend")
+    class ScheduleRequest(BaseModel):
+        email: str
+        content: str
+        scheduled_time: Optional[str] = None  # ISO format
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # In production, specify your frontend URL
