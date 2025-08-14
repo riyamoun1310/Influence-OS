@@ -35,7 +35,6 @@ class ScheduleRequest(BaseModel):
 # FastAPI and imports
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 # Database setup
 class UserProfile(BaseModel):
     name: str
@@ -101,6 +100,39 @@ class Analytics(Base):
 Base.metadata.create_all(bind=engine)
 
 # DB-backed user functions
+
+from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
+from pydantic import BaseModel
+from typing import Optional
+import os
+import openai
+import requests
+from sqlalchemy import create_engine, Column, Integer, String, JSON, DateTime, Text, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, relationship
+from datetime import datetime, timedelta
+
+app = FastAPI(title="Influence-OS1 Backend")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In production, specify your frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+class UserProfile(BaseModel):
+    name: str
+    email: str
+    linkedin_url: str
+    tone: Optional[str] = None
+
+class ScheduleRequest(BaseModel):
+    email: str
+    content: str
+    scheduled_time: Optional[str] = None  # ISO format
 def get_user_by_email(email):
     db = SessionLocal()
     user = db.query(User).filter(User.email == email).first()
@@ -135,24 +167,6 @@ def generate_article(email: str = Query(...)):
     Write a detailed, professional LinkedIn article for {name} that showcases their expertise and achievements. 
     The article should be at least 400 words, include a strong introduction, 2-3 key sections, and a conclusion with a call to action. 
     {summary}
-        question: str
-        context: Optional[str] = None
-
-        # Universal AI Q&A endpoint
-        @app.post("/ask")
-        def ask_anything(req: AskRequest):
-            prompt = req.question
-            if req.context:
-                prompt = f"Context: {req.context}\nQuestion: {req.question}"
-            # Uncomment for real OpenAI integration
-            # response = openai.ChatCompletion.create(
-            #     model="gpt-4",
-            #     messages=[{"role": "user", "content": prompt}],
-            #     max_tokens=512
-            # )
-            # return {"answer": response['choices'][0]['message']['content']}
-            # Demo static answer
-            return {"answer": f"[Sample AI answer for: {prompt}]"}
     """
     # Uncomment for real OpenAI integration
     # response = openai.ChatCompletion.create(
