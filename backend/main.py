@@ -1,19 +1,27 @@
-from fastapi.middleware.cors import CORSMiddleware
+
 from fastapi import FastAPI, HTTPException, Query, Body
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import Optional
+import os
+from sqlalchemy import create_engine, Column, Integer, String, JSON, DateTime, Text, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, relationship
+from datetime import datetime
+
 app = FastAPI(title="Influence-OS1 Backend")
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # In production, specify your frontend URL
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+	CORSMiddleware,
+	allow_origins=["*"],  # In production, specify your frontend URL
+	allow_credentials=True,
+	allow_methods=["*"],
+	allow_headers=["*"],
 )
 
 # Ask AI endpoint (OpenAI or placeholder)
 class AskRequest(BaseModel):
 	question: str
 	context: Optional[str] = None
-
 
 @app.post("/ask")
 def ask_ai(req: AskRequest = Body(...)):
