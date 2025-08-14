@@ -16,11 +16,14 @@ export default function AskAI() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question, context })
+        body: JSON.stringify({ question, context }),
       });
       const data = await res.json();
-      if (data.answer) setAnswer(data.answer);
-      else setError('No answer received.');
+      if (res.ok) {
+        setAnswer(data.answer || 'No answer returned.');
+      } else {
+        setError(data.error || 'Error from backend.');
+      }
     } catch (err) {
       setError('Error contacting AI backend.');
     }

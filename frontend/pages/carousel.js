@@ -8,9 +8,9 @@ export default function Carousel() {
   const generateCarousel = async () => {
     setLoading(true);
     setCarousel([]);
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/generate-carousel?email=${email}`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/generate-carousel?email=${email}`);
     const data = await res.json();
-    setCarousel(data.carousel || []);
+    setCarousel(data.slides || []);
     setLoading(false);
   };
 
@@ -26,7 +26,11 @@ export default function Carousel() {
         <div style={{ marginTop: 24, background: '#f9f9f9', padding: 16, borderRadius: 8 }}>
           <b>Carousel Slides:</b>
           <ol>
-            {carousel.map((slide, i) => <li key={i}>{slide}</li>)}
+            {carousel.map((slide, i) => (
+              <li key={i}>
+                <b>{slide.title}:</b> {slide.content}
+              </li>
+            ))}
           </ol>
         </div>
       )}

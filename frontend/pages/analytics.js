@@ -7,7 +7,7 @@ export default function Analytics() {
 
   const fetchAnalytics = async () => {
     setLoading(true);
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/analytics/${email}`);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/analytics?email=${email}`);
     const data = await res.json();
     setAnalytics(data);
     setLoading(false);

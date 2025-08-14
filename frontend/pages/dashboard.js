@@ -9,7 +9,7 @@ export default function Dashboard() {
 
   const fetchProfile = async () => {
     setLoading(true);
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profile/${email}`);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profile?email=${email}`);
     const data = await res.json();
     setProfile(data.profile);
     setLoading(false);
