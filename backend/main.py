@@ -217,50 +217,67 @@ def onboard_user(profile: UserProfile):
 # ...existing code for /onboard and /schedule-content endpoints...
 
 # Paste here:
-# Generate Article endpoint
+
+# Generate Article endpoint (dynamic)
 @app.get("/generate-article")
 def generate_article(email: str = Query(...)):
-    user = get_user_by_email(email)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return {
-        "title": "How to Build Influence on LinkedIn",
-        "content": f"This is a generated article for {user.name}. Start by optimizing your profile..."
-    }
+	user = get_user_by_email(email)
+	if not user:
+		raise HTTPException(status_code=404, detail="User not found")
+	# Example: Use user profile data to generate a more personalized article
+	profile = user.profile_data or {}
+	name = profile.get("name", user.name)
+	linkedin_url = profile.get("linkedin_url", "")
+	return {
+		"title": f"How {name} Can Build Influence on LinkedIn",
+		"content": f"{name}, to build your influence, start by optimizing your LinkedIn profile at {linkedin_url}. Post regularly, engage with your network, and share valuable insights."
+	}
 
-# Generate Carousel endpoint
+# Generate Carousel endpoint (dynamic)
 @app.get("/generate-carousel")
 def generate_carousel(email: str = Query(...)):
-    user = get_user_by_email(email)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return {
-        "slides": [
-            {"title": "Step 1", "content": "Optimize your LinkedIn profile."},
-            {"title": "Step 2", "content": "Post regularly with value."},
-            {"title": "Step 3", "content": f"Engage with your network, {user.name}."}
-        ]
-    }
+	user = get_user_by_email(email)
+	if not user:
+		raise HTTPException(status_code=404, detail="User not found")
+	profile = user.profile_data or {}
+	name = profile.get("name", user.name)
+	return {
+		"slides": [
+			{"title": "Step 1", "content": f"{name}, optimize your LinkedIn profile."},
+			{"title": "Step 2", "content": "Post regularly with value."},
+			{"title": "Step 3", "content": f"Engage with your network, {name}."}
+		]
+	}
 
-# --- Added missing endpoints for frontend integration ---
+# Generate Content endpoint (dynamic)
 @app.get("/generate-content")
 def generate_content(email: str = Query(...)):
 	user = get_user_by_email(email)
 	if not user:
 		raise HTTPException(status_code=404, detail="User not found")
+	profile = user.profile_data or {}
+	tone = profile.get("tone", "professional")
 	return {
-		"content": f"Generated content for {user.name}. Post something valuable!"
+		"content": f"Here is a {tone} post idea for you, {user.name}: Share a recent success story or lesson learned in your industry."
 	}
 
+# Industry News endpoint (real NewsAPI integration)
+import requests
 @app.get("/industry-news")
 def industry_news(query: str = Query(...)):
-	# Dummy news data
-	return {
-		"articles": [
-			{"title": f"Latest in {query}", "summary": f"This is a summary about {query}."},
-			{"title": f"{query} Trends", "summary": f"Trends in {query} for 2025."}
-		]
-	}
+	newsapi_key = os.getenv("NEWSAPI_KEY")
+	if not newsapi_key:
+		raise HTTPException(status_code=500, detail="NewsAPI key not configured.")
+	url = f"https://newsapi.org/v2/everything?q={query}&sortBy=publishedAt&apiKey={newsapi_key}&language=en&pageSize=5"
+	response = requests.get(url)
+	if response.status_code != 200:
+		raise HTTPException(status_code=502, detail="Failed to fetch news from NewsAPI.")
+	data = response.json()
+	articles = [
+		{"title": a["title"], "summary": a.get("description", ""), "url": a.get("url", "")}
+		for a in data.get("articles", [])
+	]
+	return {"articles": articles}
 
 @app.post("/compliance-check")
 def compliance_check():
