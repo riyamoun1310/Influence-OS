@@ -3,6 +3,7 @@
 
 # FastAPI and imports
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 # Database setup
 class UserProfile(BaseModel):
@@ -86,7 +87,14 @@ def create_or_update_user(profile):
     db.commit()
     db.close()
 
-app = FastAPI(title="Influence OS Backend")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In production, specify your frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Generate LinkedIn article
 @app.get("/generate-article")
@@ -162,7 +170,7 @@ def generate_carousel(email: str = Query(...)):
     return {"carousel": slides}
 from datetime import datetime, timedelta
 
-app = FastAPI(title="Influence OS Backend")
+app = FastAPI(title="Influence-OS1 Backend")
 
 # Industry research endpoint (NewsAPI)
 NEWSAPI_KEY = os.getenv("NEWSAPI_KEY", "your_newsapi_key")
@@ -228,7 +236,7 @@ from typing import Optional
 import os
 import openai
 
-app = FastAPI(title="Influence OS Backend")
+app = FastAPI(title="Influence-OS1 Backend")
 
 # Content generation endpoint (convincing, hire-me tone)
 def generate_convincing_content(profile):
@@ -426,7 +434,7 @@ def compliance_check(req: ScheduleRequest):
 
 @app.get("/")
 def read_root():
-    return {"message": "Influence OS backend is running."}
+    return {"message": "Influence-OS1 backend is running."}
 
 # Onboard user (DB-backed)
 @app.post("/onboard")

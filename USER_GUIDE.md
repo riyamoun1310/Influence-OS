@@ -1,4 +1,4 @@
-# Influence OS User Guide
+# Influence-OS1 User Guide
 
 ## Getting Started
 1. Clone the repository and install dependencies (see README).

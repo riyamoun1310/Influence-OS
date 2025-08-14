@@ -25,7 +25,7 @@ export default function Dashboard() {
 
   return (
     <div style={{ maxWidth: 700, margin: '40px auto', padding: 24 }}>
-      <h2>Influence OS Dashboard</h2>
+  <h2>Influence-OS1 Dashboard</h2>
       <div>
         <input value={email} onChange={e => setEmail(e.target.value)} style={{ width: 300 }} />
         <button onClick={fetchProfile} style={{ marginLeft: 8 }}>Fetch Profile</button>

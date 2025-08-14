@@ -1,4 +1,4 @@
-# Influence OS Technical Report
+# Influence-OS1 Technical Report
 
 ## 1. Introduction
 - Project overview and objectives

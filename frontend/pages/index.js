@@ -27,7 +27,7 @@ export default function Home() {
 
   return (
     <div style={{ maxWidth: 500, margin: '40px auto', padding: 24, border: '1px solid #eee', borderRadius: 8 }}>
-      <h2>Influence OS Onboarding</h2>
+  <h2>Influence-OS1 Onboarding</h2>
       <form onSubmit={handleSubmit}>
         <label>Name:<br />
           <input name="name" value={form.name} onChange={handleChange} required style={{ width: '100%' }} />

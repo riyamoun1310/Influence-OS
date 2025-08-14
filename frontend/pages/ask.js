@@ -29,7 +29,7 @@ export default function AskAI() {
 
   return (
     <main style={{ maxWidth: 600, margin: '3rem auto', background: '#fff', borderRadius: 18, boxShadow: '0 4px 24px rgba(0,119,181,0.07)', padding: '2rem' }}>
-      <h2 style={{ color: '#0077b5', marginBottom: 24 }}>Ask AI — Influence-OS1</h2>
+  <h2 style={{ color: '#0077b5', marginBottom: 24 }}>Ask AI — Influence-OS1</h2>
       <form onSubmit={handleAsk} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <label>
           <b>Question</b>

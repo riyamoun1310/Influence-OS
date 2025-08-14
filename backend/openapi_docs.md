@@ -1,4 +1,4 @@
-# Influence OS API Documentation
+# Influence-OS1 API Documentation
 
 ## Base URL
 `http://localhost:8000/`

@@ -1,7 +1,7 @@
-# Influence OS - LinkedIn Personal Branding AI Agent
+# Influence-OS1 - LinkedIn Personal Branding AI Agent
 
 ## Project Summary
-Influence OS is an autonomous AI agent that researches, creates, and posts personal branding content for LinkedIn. It analyzes user profiles, generates engaging content, schedules and posts automatically, and tracks engagement analytics—all with a professional, convincing tone to help users get hired.
+Influence-OS1 is an autonomous AI agent that researches, creates, and posts personal branding content for LinkedIn. It analyzes user profiles, generates engaging content, schedules and posts automatically, and tracks engagement analytics—all with a professional, convincing tone to help users get hired.
 
 ## Project Structure
 - `backend/` - FastAPI backend (Python)

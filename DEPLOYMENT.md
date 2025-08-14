@@ -1,4 +1,4 @@
-# Influence OS Deployment Instructions
+# Influence-OS1 Deployment Instructions
 
 ## Prerequisites
 - Python 3.8+
