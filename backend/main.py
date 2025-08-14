@@ -1,3 +1,34 @@
+# FastAPI and imports
+from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
+from typing import Optional
+import os
+import openai
+import requests
+from sqlalchemy import create_engine, Column, Integer, String, JSON, DateTime, Text, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, relationship
+from datetime import datetime, timedelta
+
+app = FastAPI(title="Influence-OS1 Backend")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In production, specify your frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+class UserProfile(BaseModel):
+    name: str
+    email: str
+    linkedin_url: str
+
+class ScheduleRequest(BaseModel):
+    email: str
+    content: str
+    scheduled_time: Optional[str] = None  # ISO format
+
 
 # FastAPI and imports (move to top)
 
@@ -37,6 +68,33 @@ Base = declarative_base()
 
 class User(Base):
     __tablename__ = "users"
+
+from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
+from pydantic import BaseModel
+from typing import Optional
+import os
+import openai
+import requests
+from sqlalchemy import create_engine, Column, Integer, String, JSON, DateTime, Text, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, relationship
+from datetime import datetime, timedelta
+
+app = FastAPI(title="Influence-OS1 Backend")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In production, specify your frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@localhost:5432/influenceos")
+engine = create_engine(DATABASE_URL, echo=True, future=True)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
     id = Column(Integer, primary_key=True, index=True)
     linkedin_id = Column(String, unique=True, index=True, nullable=True)
     name = Column(String)
@@ -88,13 +146,7 @@ def create_or_update_user(profile):
     db.close()
 
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # In production, specify your frontend URL
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+
 
 # Generate LinkedIn article
 @app.get("/generate-article")
@@ -168,9 +220,9 @@ def generate_carousel(email: str = Query(...)):
         "Slide 5: Let's Connect!"
     ]
     return {"carousel": slides}
-from datetime import datetime, timedelta
 
-app = FastAPI(title="Influence-OS1 Backend")
+
+
 
 # Industry research endpoint (NewsAPI)
 NEWSAPI_KEY = os.getenv("NEWSAPI_KEY", "your_newsapi_key")
@@ -230,13 +282,7 @@ def linkedin_callback(code: str):
     email = requests.get(LINKEDIN_EMAIL_URL, headers={"Authorization": f"Bearer {token}"}).json()
     return {"access_token": token, "profile": profile, "email": email}
 
-from fastapi import FastAPI, HTTPException, Query
-from pydantic import BaseModel
-from typing import Optional
-import os
-import openai
 
-app = FastAPI(title="Influence-OS1 Backend")
 
 # Content generation endpoint (convincing, hire-me tone)
 def generate_convincing_content(profile):
@@ -288,7 +334,6 @@ user_db = {}
 content_calendar = []
 analytics_db = {}
 # Schedule content (add to calendar)
-from datetime import datetime, timedelta
 
 class ScheduleRequest(BaseModel):
     email: str
