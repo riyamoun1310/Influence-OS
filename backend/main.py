@@ -1,7 +1,15 @@
+
 # FastAPI and imports (move to top)
 
 # FastAPI and imports
 from fastapi import FastAPI, HTTPException, Query
+from pydantic import BaseModel
+# Database setup
+class UserProfile(BaseModel):
+    name: str
+    email: str
+    linkedin_url: str
+    tone: str
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from typing import Optional
