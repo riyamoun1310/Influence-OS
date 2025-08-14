@@ -1,3 +1,4 @@
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException, Query, Body
 app = FastAPI(title="Influence-OS1 Backend")
 app.add_middleware(
