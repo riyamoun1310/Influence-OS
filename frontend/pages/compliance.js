@@ -12,7 +12,7 @@ export default function Compliance() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/compliance-check`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, content }),
+      body: JSON.stringify({ content }),
     });
     const data = await res.json();
     setResult(data);
