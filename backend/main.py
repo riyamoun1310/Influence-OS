@@ -218,22 +218,43 @@ def onboard_user(profile: UserProfile):
 
 # Paste here:
 
-# Generate Article endpoint (dynamic)
+
+# Generate Article endpoint (OpenAI + analytics)
 @app.get("/generate-article")
 def generate_article(email: str = Query(...)):
 	user = get_user_by_email(email)
 	if not user:
 		raise HTTPException(status_code=404, detail="User not found")
-	# Example: Use user profile data to generate a more personalized article
 	profile = user.profile_data or {}
 	name = profile.get("name", user.name)
 	linkedin_url = profile.get("linkedin_url", "")
+	# Get analytics
+	db = SessionLocal()
+	analytics = db.query(Analytics).filter(Analytics.user_id == user.id).first()
+	db.close()
+	stats = f"You have {analytics.posts if analytics else 0} posts, {analytics.likes if analytics else 0} likes, and {analytics.shares if analytics else 0} shares."
+	openai_api_key = os.getenv("OPENAI_API_KEY")
+	if openai_api_key:
+		import openai
+		openai.api_key = openai_api_key
+		prompt = f"Write a LinkedIn article for {name} ({linkedin_url}) to help them build influence. {stats}"
+		try:
+			response = openai.ChatCompletion.create(
+				model="gpt-3.5-turbo",
+				messages=[{"role": "user", "content": prompt}],
+				max_tokens=400
+			)
+			content = response['choices'][0]['message']['content']
+			return {"title": f"How {name} Can Build Influence on LinkedIn", "content": content}
+		except Exception as e:
+			return {"error": str(e)}
+	# Fallback
 	return {
 		"title": f"How {name} Can Build Influence on LinkedIn",
-		"content": f"{name}, to build your influence, start by optimizing your LinkedIn profile at {linkedin_url}. Post regularly, engage with your network, and share valuable insights."
+		"content": f"{name}, to build your influence, start by optimizing your LinkedIn profile at {linkedin_url}. Post regularly, engage with your network, and share valuable insights. {stats}"
 	}
 
-# Generate Carousel endpoint (dynamic)
+# Generate Carousel endpoint (OpenAI + calendar)
 @app.get("/generate-carousel")
 def generate_carousel(email: str = Query(...)):
 	user = get_user_by_email(email)
@@ -241,6 +262,26 @@ def generate_carousel(email: str = Query(...)):
 		raise HTTPException(status_code=404, detail="User not found")
 	profile = user.profile_data or {}
 	name = profile.get("name", user.name)
+	db = SessionLocal()
+	entries = db.query(CalendarEntry).filter(CalendarEntry.user_id == user.id).all()
+	db.close()
+	scheduled = [f"{e.content} at {e.scheduled_time}" for e in entries]
+	openai_api_key = os.getenv("OPENAI_API_KEY")
+	if openai_api_key:
+		import openai
+		openai.api_key = openai_api_key
+		prompt = f"Create 3 LinkedIn carousel slides for {name}. Scheduled content: {scheduled}"
+		try:
+			response = openai.ChatCompletion.create(
+				model="gpt-3.5-turbo",
+				messages=[{"role": "user", "content": prompt}],
+				max_tokens=300
+			)
+			slides = response['choices'][0]['message']['content']
+			return {"slides": slides}
+		except Exception as e:
+			return {"error": str(e)}
+	# Fallback
 	return {
 		"slides": [
 			{"title": "Step 1", "content": f"{name}, optimize your LinkedIn profile."},
@@ -249,7 +290,7 @@ def generate_carousel(email: str = Query(...)):
 		]
 	}
 
-# Generate Content endpoint (dynamic)
+# Generate Content endpoint (OpenAI + analytics)
 @app.get("/generate-content")
 def generate_content(email: str = Query(...)):
 	user = get_user_by_email(email)
@@ -257,8 +298,28 @@ def generate_content(email: str = Query(...)):
 		raise HTTPException(status_code=404, detail="User not found")
 	profile = user.profile_data or {}
 	tone = profile.get("tone", "professional")
+	db = SessionLocal()
+	analytics = db.query(Analytics).filter(Analytics.user_id == user.id).first()
+	db.close()
+	stats = f"You have {analytics.posts if analytics else 0} posts, {analytics.likes if analytics else 0} likes, and {analytics.shares if analytics else 0} shares."
+	openai_api_key = os.getenv("OPENAI_API_KEY")
+	if openai_api_key:
+		import openai
+		openai.api_key = openai_api_key
+		prompt = f"Suggest a {tone} LinkedIn post idea for {user.name}. {stats}"
+		try:
+			response = openai.ChatCompletion.create(
+				model="gpt-3.5-turbo",
+				messages=[{"role": "user", "content": prompt}],
+				max_tokens=150
+			)
+			content = response['choices'][0]['message']['content']
+			return {"content": content}
+		except Exception as e:
+			return {"error": str(e)}
+	# Fallback
 	return {
-		"content": f"Here is a {tone} post idea for you, {user.name}: Share a recent success story or lesson learned in your industry."
+		"content": f"Here is a {tone} post idea for you, {user.name}: Share a recent success story or lesson learned in your industry. {stats}"
 	}
 
 # Industry News endpoint (real NewsAPI integration)
@@ -279,12 +340,29 @@ def industry_news(query: str = Query(...)):
 	]
 	return {"articles": articles}
 
+
+# Compliance check endpoint (basic keyword filter)
 @app.post("/compliance-check")
-def compliance_check():
-	# Dummy compliance check
+def compliance_check(content: str = Body(...)):
+	# Example: List of banned keywords
+	banned_keywords = ["spam", "scam", "fake", "offensive"]
+	found = [word for word in banned_keywords if word in content.lower()]
+	if found:
+		return {"compliant": False, "details": f"Content contains banned keywords: {', '.join(found)}"}
 	return {"compliant": True, "details": "Content is compliant with guidelines."}
 
+
+# LinkedIn login endpoint (returns real OAuth URL)
 @app.get("/linkedin/login")
 def linkedin_login():
-	# Dummy LinkedIn login endpoint
-	return {"message": "LinkedIn login placeholder. Implement OAuth here."}
+	client_id = os.getenv("LINKEDIN_CLIENT_ID")
+	redirect_uri = os.getenv("LINKEDIN_REDIRECT_URI")
+	if not client_id or not redirect_uri:
+		return {"error": "LinkedIn OAuth not configured."}
+	url = (
+		f"https://www.linkedin.com/oauth/v2/authorization?response_type=code"
+		f"&client_id={client_id}"
+		f"&redirect_uri={redirect_uri}"
+		f"&scope=r_liteprofile%20r_emailaddress%20w_member_social"
+	)
+	return {"auth_url": url}
