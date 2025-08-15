@@ -1,3 +1,50 @@
+from dotenv import load_dotenv
+load_dotenv()
+from fastapi import FastAPI, HTTPException, Query, Body
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import Optional
+import os
+from sqlalchemy import create_engine, Column, Integer, String, JSON, DateTime, Text, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, relationship
+from datetime import datetime
+
+app = FastAPI(title="Influence-OS1 Backend")
+app.add_middleware(
+	CORSMiddleware,
+	allow_origins=["*"],  # In production, specify your frontend URL
+	allow_credentials=True,
+	allow_methods=["*"],
+	allow_headers=["*"],
+)
+
+# Admin endpoint to seed test data for a user
+@app.post("/admin/seed-test-data")
+def seed_test_data(email: str = Body(...), name: str = Body("Test User"), linkedin_url: str = Body("https://linkedin.com/in/testuser")):
+	db = SessionLocal()
+	# Create user if not exists
+	user = db.query(User).filter(User.email == email).first()
+	if not user:
+		user = User(name=name, email=email, profile_data={"name": name, "linkedin_url": linkedin_url, "tone": "professional"})
+		db.add(user)
+		db.commit()
+		db.refresh(user)
+	# Create analytics if not exists
+	analytics = db.query(Analytics).filter(Analytics.user_id == user.id).first()
+	if not analytics:
+		analytics = Analytics(user_id=user.id, posts=5, likes=20, comments=3, shares=2)
+		db.add(analytics)
+	# Create calendar entries if not exists
+	calendar = db.query(CalendarEntry).filter(CalendarEntry.user_id == user.id).all()
+	if not calendar:
+		entry1 = CalendarEntry(user_id=user.id, content="Post about AI trends", scheduled_time=datetime.utcnow(), status="scheduled")
+		entry2 = CalendarEntry(user_id=user.id, content="Share LinkedIn tips", scheduled_time=datetime.utcnow(), status="scheduled")
+		db.add(entry1)
+		db.add(entry2)
+	db.commit()
+	db.close()
+	return {"message": "Test data seeded for user.", "email": email}
 
 from fastapi import FastAPI, HTTPException, Query, Body
 from fastapi.middleware.cors import CORSMiddleware
